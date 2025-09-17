@@ -14,13 +14,13 @@ on:
 # 工作流环境变量
 env:
   # 应用的application_id
-  APP_ID: com.app
+  APP_ID: com.app.debug
   # 应用名称
-  APP_NAME: Taro Demo
+  APP_NAME: Taro Demo Debug
   # 打包类型
   BUILD_TYPE: debug
   # 版本名称
-  VERSION_NAME: 1.0.0
+  VERSION_NAME: 2.0.0
   # 版本号
   VERSION_CODE: 10
   # 密钥库文件
