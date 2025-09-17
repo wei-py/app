@@ -49,8 +49,8 @@ function saveImg(message: any) {
 
 function getInfo(): string {
   const appInfo = getAppBaseInfo();
-  console.log(appInfo.version, Platform.OS);
-  appInfo.version = "2.1.0" // 测试使用
+  // console.log(appInfo.version, Platform.OS);
+  // appInfo.version = "2.1.0" // 测试使用
   const info = { version: appInfo.version, os: Platform.OS };
   return `window.getDeviceInfo('${JSON.stringify(info)}');`
 }

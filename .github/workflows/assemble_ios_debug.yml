@@ -14,9 +14,9 @@ on:
 # 工作流环境变量
 env:
   # 应用的application_id
-  APP_ID: ${{secrets.APP_ID}}
-  APP_NAME: Taro Demo
-  VERSION_NUMBER: 1.0.0
+  APP_ID: ${{secrets.APP_ID_DEBUG}}
+  APP_NAME: Taro Demo Debug
+  VERSION_NUMBER: 2.1.0
   BUILD_TYPE: debug
   TEAM_ID: ${{secrets.TEAM_ID}}
   PROVISIONING_PROFILE_SPECIFIER: ${{secrets.DEBUG_PROVISIONING_PROFILE_SPECIFIER}}
