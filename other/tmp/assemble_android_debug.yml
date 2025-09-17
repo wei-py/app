@@ -20,7 +20,7 @@ env:
   # 打包类型
   BUILD_TYPE: debug
   # 版本名称
-  VERSION_NAME: 2.0.0
+  VERSION_NAME: 2.9.0
   # 版本号
   VERSION_CODE: 10
   # 密钥库文件

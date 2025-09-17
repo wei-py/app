@@ -20,7 +20,7 @@ env:
   # 打包类型
   BUILD_TYPE: release
   # 版本名称 (可以从 Tag 中提取，但这里先写死)
-  VERSION_NAME: 2.0.0
+  VERSION_NAME: 2.9.0
   # 版本号
   VERSION_CODE: 10
   # 密钥库文件
