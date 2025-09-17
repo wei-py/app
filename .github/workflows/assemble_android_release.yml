@@ -80,10 +80,11 @@ jobs:
       # 👇 关键步骤：将签名文件从 Secrets 写入磁盘
       - name: Prepare Keystore
         run: |
+          mkdir -p android/app
           # 将 Base64 编码的密钥库文件解码并保存
-          echo "${{ secrets.RELEASE_KEYSTORE_FILE }}" | base64 -d > android/app/${{ env.KEYSTORE_FILE_NAME }}
+          echo "${{ secrets.RELEASE_KEYSTORE_FILE }}" | base64 -d > android/app/release.keystore
           # 设置环境变量，供 Gradle 使用
-          echo "KEYSTORE_FILE=${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE_NAME }}" >> $GITHUB_ENV
+          echo "KEYSTORE_FILE=${{ github.workspace }}/android/app/release.keystore" >> $GITHUB_ENV
 
       # 👇 构建 Release 包 (使用 ./gradlew，最稳定)
       - name: Assemble Android ${{ env.BUILD_TYPE }}
