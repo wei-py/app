@@ -2,4 +2,4 @@
 #
 # Ensure this file is checked in to source control!
 
-gem 'fastlane-plugin-update_android_strings', git: 'https://github.com/SiarheiFedartsou/fastlane-plugin-update_android_strings.git'
+gem 'fastlane-plugin-update_android_strings'

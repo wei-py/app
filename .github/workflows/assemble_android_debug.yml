@@ -60,12 +60,17 @@ jobs:
           key: ${{ runner.os }}-gradle
           restore-keys: |
             ${{ runner.os }}-gradle
-      
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'  # 或根据你的 Gemfile.lock 指定版本
-          bundler-cache: true  # 自动缓存 bundle install 结果，加速后续构建
+          ruby-version: "3.2" # 或根据你的 Gemfile.lock 指定版本
+          bundler-cache: true # 自动缓存 bundle install 结果，加速后续构建
+
+      - name: Update Android strings.xml
+        run: |
+          chmod +x .github/scripts/update_strings.sh
+          ./.github/scripts/update_strings.sh
 
       - name: Assemble Android ${{ env.BUILD_TYPE }}
         run: |
