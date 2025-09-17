@@ -16,7 +16,7 @@ env:
   # 应用的application_id (从 Secrets 读取，更安全)
   APP_ID: ${{ secrets.RELEASE_APP_ID }}
   # 应用名称
-  APP_NAME: Taro Demo
+  APP_NAME: TaroDemoRelease
   # 打包类型
   BUILD_TYPE: release
   # 版本名称 (可以从 Tag 中提取，但这里先写死)

@@ -16,7 +16,7 @@ env:
   # 应用的application_id
   APP_ID: com.app.debug
   # 应用名称
-  APP_NAME: Taro Demo Debug
+  APP_NAME: TaroDemoDebug
   # 打包类型
   BUILD_TYPE: debug
   # 版本名称

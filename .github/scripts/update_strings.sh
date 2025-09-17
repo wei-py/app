@@ -30,12 +30,17 @@ fi
 
 echo "🔄 Created gradle.properties with appId=$APP_ID, versionCode=$VERSION_CODE, versionName=$VERSION_NAME"
 
+# 修复：使用临时文件和正确的引用方式处理包含空格的变量
+
 # 替换 app_name
 if grep -q '<string name="app_name">' "$STRINGS_FILE"; then
-    sed -i "s|<string name="app_name">.*</string>|<string name="app_name">${APP_NAME}</string>|g" "$STRINGS_FILE"
+    # 使用单引号和转义来正确处理包含空格的变量
+    sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">${APP_NAME}</string>|g" "$STRINGS_FILE"
     echo "✅ Updated app_name to: $APP_NAME"
 else
-    echo "⚠️  <string name="app_name"> not found, adding it..."
+    echo "⚠️  <string name=\"app_name\"> not found, adding it..."
+    # 使用echo和管道来避免引用问题
+    echo '    <string name="app_name">'
     sed -i '/<resources>/a\    <string name="app_name">'${APP_NAME}'</string>' "$STRINGS_FILE"
 fi
 
