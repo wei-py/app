@@ -9,17 +9,17 @@ on:
   pull_request:
     branches: [main]
 
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
 # 工作流环境变量
 env:
-  # 应用的application_id (从 Secrets 读取，更安全)
-  APP_ID: ${{ secrets.RELEASE_APP_ID }}
+  # 应用的application_id
+  APP_ID: com.app
   # 应用名称
   APP_NAME: Taro Demo
   # 打包类型
   BUILD_TYPE: release
-  # 版本名称 (可以从 Tag 中提取，但这里先写死)
+  # 版本名称
   VERSION_NAME: 1.0.0
   # 版本号
   VERSION_CODE: 10
@@ -39,72 +39,41 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@v3
-
       - uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
-
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: "pnpm"
-
       - run: pnpm install
-
       - name: Cache Gradle
         uses: actions/cache@v4
+        env:
+          cache-name: gradle-cache
         with:
           path: ~/.gradle
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle
           restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # 👇 使用 setup-ruby，避免权限问题
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.2"
-          bundler-cache: true
-
-      # 👇 更新 strings.xml，和 Debug 保持一致
-      - name: Update Android strings.xml
-        run: |
-          chmod +x .github/scripts/update_strings.sh
-          ./.github/scripts/update_strings.sh
-
-      # 👇 关键步骤：将签名文件从 Secrets 写入磁盘
-      - name: Prepare Keystore
-        run: |
-          # 将 Base64 编码的密钥库文件解码并保存
-          echo "${{ secrets.RELEASE_KEYSTORE_FILE }}" | base64 -d > android/app/${{ env.KEYSTORE_FILE_NAME }}
-          # 设置环境变量，供 Gradle 使用
-          echo "KEYSTORE_FILE=${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE_NAME }}" >> $GITHUB_ENV
-
-      # 👇 构建 Release 包 (使用 ./gradlew，最稳定)
+            ${{ runner.os }}-gradle
       - name: Assemble Android ${{ env.BUILD_TYPE }}
         run: |
+          sudo apt install -y ruby-bundler
           cd android
-          ./gradlew assemble${{ env.BUILD_TYPE }} --no-daemon
+          bundle update
+          bundle exec fastlane assemble
         env:
-          # 从 Secrets 读取签名信息
-          KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-          KEYSTORE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          KEYSTORE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          KEYSTORE_FILE: ${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE }}
           NODE_PATH: ${{ github.workspace }}/node_modules/.pnpm/node_modules:$NODE_PATH
-
-      # 👇 上传产物到 Actions
       - name: Upload Android Products
         uses: actions/upload-artifact@v4
         with:
           name: app-${{ env.BUILD_TYPE }}
           path: ${{ github.workspace }}/android/app/build/outputs/apk/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
-
-      # 👇 自动创建 GitHub Release
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
