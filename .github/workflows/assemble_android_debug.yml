@@ -75,7 +75,8 @@ jobs:
       - name: Assemble Android ${{ env.BUILD_TYPE }}
         run: |
           cd android
-          bundle exec fastlane assemble
+          ./gradlew assemble${{ env.BUILD_TYPE }} --no-daemon
+          # bundle exec fastlane assemble
         env:
           KEYSTORE_FILE: ${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE }}
           NODE_PATH: ${{ github.workspace }}/node_modules/.pnpm/node_modules:$NODE_PATH
