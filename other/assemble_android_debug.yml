@@ -4,10 +4,10 @@ name: Assemble Android Debug
 # 触发工作流程的事件
 on:
   push:
-    branches: [main]
-    tags: [v*]
+    branches: [ main ]
+    tags: [ v* ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
   workflow_dispatch:
 
@@ -41,15 +41,15 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-java@v4
         with:
-          distribution: "zulu"
-          java-version: "17"
+          distribution: 'zulu'
+          java-version: '17'
       - uses: pnpm/action-setup@v2
         with:
           version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
       - run: pnpm install
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -60,16 +60,11 @@ jobs:
           key: ${{ runner.os }}-gradle
           restore-keys: |
             ${{ runner.os }}-gradle
-      
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'  # 或根据你的 Gemfile.lock 指定版本
-          bundler-cache: true  # 自动缓存 bundle install 结果，加速后续构建
-
       - name: Assemble Android ${{ env.BUILD_TYPE }}
         run: |
+          sudo apt install -y ruby-bundler
           cd android
+          bundle update
           bundle exec fastlane assemble
         env:
           KEYSTORE_FILE: ${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE }}
