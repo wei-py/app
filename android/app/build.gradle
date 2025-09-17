@@ -76,11 +76,11 @@ android {
 
     namespace "com.app"
     defaultConfig {
-        applicationId app_id
+        applicationId project.findProperty("appId") ?: "com.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode project.findProperty("versionCode")?.toInteger() ?: 1
+        versionName project.findProperty("versionName") ?: "1.0"
     }
     signingConfigs {
         debug {
