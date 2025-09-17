@@ -36,7 +36,7 @@ jobs:
         id: date
         run: echo "::set-output name=timestamp::$(date +'%s')"
       - name: Checkout Project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -46,7 +46,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install
       - name: Cache Pods
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
