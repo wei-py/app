@@ -25,7 +25,14 @@ platform :ios do
 	lane :build_dev do |options|
 		update_info_plist
 		update_code_signing_settings
-		increment_version_number
+		
+		# 设置版本号（如果环境变量中有指定）
+		if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			increment_version_number(
+				version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			)
+		end
+		
 		build_app(
 			scheme: "app2",
 			workspace: "app2.xcworkspace",
@@ -35,7 +42,11 @@ platform :ios do
 			xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
 			export_options: {
 				method: "development",
-				compileBitcode: false
+				compileBitcode: false,
+				signingStyle: "manual",
+				provisioningProfiles: {
+					ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
+				}
 			}
 		)
 	end
@@ -44,12 +55,35 @@ platform :ios do
 	lane :build_release do |options|
 		update_info_plist
 		update_code_signing_settings
-		increment_version_number
-		increment_build_number
+		
+		# 设置版本号（如果环境变量中有指定）
+		if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			increment_version_number(
+				version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			)
+		end
+		
+		# 设置构建号（如果环境变量中有指定）
+		if ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
+			increment_build_number(
+				build_number: ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
+			)
+		end
+		
 		build_app(
 			scheme: "app2",
-			# clean: true,
-			workspace: "app2.xcworkspace"
+			workspace: "app2.xcworkspace",
+			export_method: "app-store",
+			configuration: "Release",
+			clean: true,
+			export_options: {
+				method: "app-store",
+				compileBitcode: false,
+				signingStyle: "manual",
+				provisioningProfiles: {
+					ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
+				}
+			}
 		)
 	end
 	
