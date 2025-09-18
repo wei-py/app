@@ -9,18 +9,11 @@
 #
 #     https://docs.fastlane.tools/plugins/available-plugins
 #
+
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
 default_platform(:ios)
-
-# Specify the Xcode version to use for builds
-# This helps prevent issues when multiple Xcode versions are installed
-xcode_select("/Applications/Xcode.app")
-
-# Load team ID from environment or use a default
-# You can set this in your environment variables or leave empty for automatic detection
-TEAM_ID = ENV['FASTLANE_TEAM_ID'] || ENV['DEVELOPMENT_TEAM'] || ""
 
 platform :ios do
   desc "Description of what the lane does"
@@ -28,104 +21,36 @@ platform :ios do
     # add actions here: https://docs.fastlane.tools/actions
   end
 
-  # Helper lane to configure code signing
-  lane :configure_signing do |options|
-    # This will enable automatic code signing and let Xcode auto-detect the team
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      targets: ["app"],
-      code_sign_identity: options[:code_sign_identity] || "iPhone Developer",
-      profile_name: nil  # Explicitly set to nil to ensure no manual profile is used
-      # Note: team_id is omitted to let Xcode automatically detect the development team
-    )
-  end
+  desc "development"
+	lane :build_dev do |options|
+		update_info_plist
+		update_code_signing_settings
+		increment_version_number
+		build_app(
+			scheme: "app2",
+			workspace: "app2.xcworkspace",
+			export_method: "development",
+			configuration: "Debug",
+			clean: true,
+			xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
+			export_options: {
+				method: "development",
+				compileBitcode: false
+			}
+		)
+	end
 
-  desc "development build"
-  lane :build_dev do |options|
-    # Configure code signing
-    configure_signing(
-      code_sign_identity: "iPhone Developer"
-      # Removed profile_name to avoid conflict with automatic signing
-    )
-    
-    # Update info plist and version
-    update_info_plist(
-      xcodeproj: "app.xcodeproj"
-    )
-    
-    # Set version number explicitly instead of incrementing
-    increment_version_number(
-      version_number: "1.0.0"
-    )
-    
-    # Build the app with consistent automatic signing
-    build_app(
-      scheme: "app",
-      workspace: "app.xcworkspace",
-      export_method: "development",
-      configuration: "Debug",
-      clean: true,
-      xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1' CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
-      export_options: {
-        method: "development",
-        compileBitcode: false,
-        signingStyle: "automatic",
-        provisioningProfiles: {}  # Empty to ensure automatic provisioning
-      }.tap { |opts| opts[:teamID] = TEAM_ID if TEAM_ID && !TEAM_ID.empty? }
-    )
-  end
-
-  desc "release build"
-  lane :build_release do |options|
-    # Configure code signing
-    configure_signing(
-      code_sign_identity: "iPhone Distribution"
-      # Removed profile_name to avoid conflict with automatic signing
-    )
-    
-    # Update info plist and version
-    update_info_plist(
-      xcodeproj: "app.xcodeproj"
-    )
-    
-    # Set version number explicitly instead of incrementing
-    increment_version_number(
-      version_number: "1.0.0"
-    )
-    increment_build_number
-    
-    # Build the app with consistent automatic signing
-    build_app(
-      scheme: "app",
-      workspace: "app.xcworkspace",
-      export_method: "app-store",
-      configuration: "Release",
-      clean: true,
-      xcargs: "CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
-      export_options: {
-        method: "app-store",
-        compileBitcode: true,
-        signingStyle: "automatic",
-        provisioningProfiles: {}  # Empty to ensure automatic provisioning
-      }.tap { |opts| opts[:teamID] = TEAM_ID if TEAM_ID && !TEAM_ID.empty? }
-    )
-  end
-  
-  # Utility lane to fix common build issues
-  lane :fix_build_issues do
-    # Clean derived data
-    sh "rm -rf ~/Library/Developer/Xcode/DerivedData/*"
-    
-    # Reinstall pods - using absolute path to ensure it works from any directory
-    sh "cd #{File.expand_path(File.join(File.dirname(__FILE__), '..'))} && pod deintegrate && pod install"
-    
-    # Show instructions for manual setup
-    puts "\n\nIMPORTANT NOTES:"
-    puts "1. Make sure you have set up your Apple Developer account in Xcode"
-    puts "2. Open Xcode and go to Signing & Capabilities for the app target"
-    puts "3. Select your development team"
-    puts "4. If using automatic signing, ensure Xcode can manage certificates"
-    puts "5. For manual signing, ensure you have valid provisioning profiles"
-  end
-  
+	desc "release"
+	lane :build_release do |options|
+		update_info_plist
+		update_code_signing_settings
+		increment_version_number
+		increment_build_number
+		build_app(
+			scheme: "app2",
+			# clean: true,
+			workspace: "app2.xcworkspace"
+		)
+	end
+	
 end

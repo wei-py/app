@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "app2",
   "version": "1.0.0",
   "private": true,
   "description": "aaaa",
@@ -42,10 +42,10 @@
   "author": "",
   "dependencies": {
     "@babel/runtime": "^7.20.0",
-    "@bam.tech/react-native-image-resizer": "^3.0.10",
+    "@bam.tech/react-native-image-resizer": "^3.0.11",
     "@react-native-async-storage/async-storage": "1.21.0",
-    "@react-native-camera-roll/camera-roll": "^7.8.3",
-    "@react-native-clipboard/clipboard": "^1.14.3",
+    "@react-native-camera-roll/camera-roll": "^7.10.2",
+    "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/cli-platform-android": "^12.3.0",
     "@react-native-community/geolocation": "^3.4.0",
     "@react-native-community/netinfo": "11.1.0",
@@ -83,8 +83,8 @@
     "react": "^18",
     "react-dom": "^18.2.0",
     "react-native": "^0.73.1",
-    "react-native-device-info": "^14.0.0",
-    "react-native-gesture-handler": "~2.14.0",
+    "react-native-device-info": "^14.1.1",
+    "react-native-gesture-handler": "~2.14.1",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-pager-view": "6.2.3",
     "react-native-root-siblings": "^5.0.1",
@@ -102,6 +102,8 @@
     "@react-native/typescript-config": "^0.73.1",
     "@tarojs/cli": "4.1.6",
     "@tarojs/rn-runner": "4.1.6",
+    "@tarojs/taro-loader": "4.1.6",
+    "@tarojs/webpack5-runner": "4.1.6",
     "@types/node": "^18.15.11",
     "@types/react": "^18.2.6",
     "@types/webpack-env": "^1.13.6",
@@ -119,6 +121,7 @@
     "react-refresh": "^0.11.0",
     "stylelint": ">=16.4.0 <=16.10.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.0"
+    "typescript": "^5.1.0",
+    "webpack": "^5.78.0"
   }
 }

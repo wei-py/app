@@ -19,12 +19,12 @@ platform :android do
 
   desc "assemble"
   lane :assemble do
-    # update_android_strings(
-    #   xml_path: 'app/src/main/res/values/strings.xml',
-    #   block: lambda { |strings|
-    #     strings['app_name'] = ENV['APP_NAME']
-    #   }
-    # )
+    update_android_strings(
+      xml_path: 'app/src/main/res/values/strings.xml',
+      block: lambda { |strings|
+        strings['app_name'] = ENV['APP_NAME']
+      }
+    )
     gradle(
       task: "assemble",
       build_type: ENV['BUILD_TYPE'],
