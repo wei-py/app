@@ -52,6 +52,13 @@ jobs:
           cache: "pnpm"
       - run: pnpm install
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          working-directory: android
+
       - name: Cache Gradle
         uses: actions/cache@v4
         env:
@@ -62,12 +69,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      - name: Assemble Android ${{ env.BUILD_TYPE }}
+      - name: Install Ruby dependencies
+        working-directory: android
         run: |
-          sudo apt install -y ruby-bundler
-          cd android
-          bundle update
-          bundle exec fastlane assemble
+          gem install bundler
+          bundle config set --local deployment 'false'
+          bundle config set --local path 'vendor/bundle'
+          bundle install --retry=3 --jobs=4
+
+      - name: Assemble Android ${{ env.BUILD_TYPE }}
+        working-directory: android
+        run: bundle exec fastlane assemble
         env:
           KEYSTORE_FILE: ${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE }}
           NODE_PATH: ${{ github.workspace }}/node_modules/.pnpm/node_modules:$NODE_PATH
