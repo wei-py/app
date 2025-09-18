@@ -9,3 +9,22 @@
 - 查看 Android 项目的 Fastlane 配置和构建脚本
 - 检查 Android 项目的 Gradle 配置和依赖
 - 分析密钥库配置和签名设置
+
+## android_debug_issue1
+
+1. uses: actions/cache@v2 已废弃, 请使用 actions/cache@v4
+2. pnpm-workspace
+
+   ```yaml
+   packages:
+     - "."
+
+   onlyBuiltDependencies:
+     - "@parcel/watcher"
+     - "@swc/core"
+     - "@tarojs/binding"
+     - "@tarojs/cli"
+     - core-js
+     - core-js-pure
+     - esbuild
+   ```
