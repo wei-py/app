@@ -43,6 +43,11 @@
 4. DEBUG_PROVISIONING_PROFILE_DATA : 设置为您的配置文件的 base64 编码内容
 5. DEBUG_PROVISIONING_PROFILE_SPECIFIER : 设置为您的配置文件名称
 
+
+base64 -i ./BoGuang.mobileprovision -o ./BoGuang.mobileprovision.txt
+base64 -i ./newBto.p12 -o ./newBto.p12.txt
+
+
 ### 步骤 2：如何获取正确的证书数据
 
 要获取.p12 证书和配置文件的 base64 编码内容，请在本地计算机上执行以下命令：

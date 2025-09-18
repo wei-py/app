@@ -4,10 +4,10 @@ name: Assemble Ios Debug
 # 触发工作流程的事件
 on:
   push:
-    branches: [ main ]
-    tags: [ v* ]
+    branches: [main]
+    tags: [v*]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   workflow_dispatch:
 
@@ -16,7 +16,7 @@ env:
   # 应用的application_id
   APP_ID: ${{secrets.APP_ID_DEBUG}}
   APP_NAME: Taro Demo Debug
-  VERSION_NUMBER: 2.1.0
+  VERSION_NUMBER: 2.9.0
   BUILD_TYPE: debug
   TEAM_ID: ${{secrets.TEAM_ID}}
   PROVISIONING_PROFILE_SPECIFIER: ${{secrets.DEBUG_PROVISIONING_PROFILE_SPECIFIER}}
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm install
       - name: Cache Pods
         uses: actions/cache@v4
