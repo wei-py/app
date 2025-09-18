@@ -26,7 +26,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'app' do
+target 'app2' do
   use_expo_modules!
   post_integrate do |installer|
     begin
@@ -48,7 +48,7 @@ target 'app' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'appTests' do
+  target 'app2Tests' do
     inherit! :complete
     # Pods for testing
   end
@@ -60,14 +60,5 @@ target 'app' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-    
-    # Fix iOS deployment target for all pods to be at least 12.0
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-        end
-      end
-    end
   end
 end

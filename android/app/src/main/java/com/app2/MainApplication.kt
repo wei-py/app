@@ -1,4 +1,4 @@
-package com.app
+package com.app2
 import android.content.res.Configuration
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
