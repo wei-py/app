@@ -31,6 +31,7 @@ We've completely refactored the Fastfile with these key improvements:
 - **Utility Lane**: Added a `fix_build_issues` lane to automate common fixes
 - **Parameter Fix**: Removed unsupported 'target' parameter from update_info_plist actions
 - **Path Robustness**: Improved path handling in the fix_build_issues lane to work correctly from any directory
+- **Code Signing Conflict Fix**: Removed conflicting manual provisioning profile specifications when using automatic signing to resolve build errors
 
 ### 2. Appfile Configuration
 
@@ -141,6 +142,7 @@ If you're still experiencing issues:
    - Ensure 'Automatically manage signing' is checked
    - Ensure your development team is selected
    - Check for any errors or warnings in the 'Signing & Capabilities' tab
+   - If you see "conflicting provisioning settings" error, make sure you're not mixing automatic signing with manual provisioning profile selection
 
 4. **Update Dependencies**
    ```bash
