@@ -23,13 +23,21 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Description of what the lane does
 
+### ios configure_signing
+
+```sh
+[bundle exec] fastlane ios configure_signing
+```
+
+
+
 ### ios build_dev
 
 ```sh
 [bundle exec] fastlane ios build_dev
 ```
 
-development
+development build
 
 ### ios build_release
 
@@ -37,7 +45,15 @@ development
 [bundle exec] fastlane ios build_release
 ```
 
-release
+release build
+
+### ios fix_build_issues
+
+```sh
+[bundle exec] fastlane ios fix_build_issues
+```
+
+
 
 ----
 

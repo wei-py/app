@@ -19,8 +19,8 @@ default_platform(:ios)
 xcode_select("/Applications/Xcode.app")
 
 # Load team ID from environment or use a default
-# You can set this in your environment variables or uncomment and replace
-TEAM_ID = ENV['FASTLANE_TEAM_ID'] || 'YOUR_TEAM_ID'
+# You can set this in your environment variables or leave empty for automatic detection
+TEAM_ID = ENV['FASTLANE_TEAM_ID'] || ENV['DEVELOPMENT_TEAM'] || ""
 
 platform :ios do
   desc "Description of what the lane does"
@@ -30,13 +30,13 @@ platform :ios do
 
   # Helper lane to configure code signing
   lane :configure_signing do |options|
-    # This will enable automatic code signing with the specified team ID
+    # This will enable automatic code signing and let Xcode auto-detect the team
     update_code_signing_settings(
       use_automatic_signing: true,
-      team_id: TEAM_ID,
-      targets: "app",
-      code_sign_identity: options[:code_sign_identity] || "iPhone Developer"
-      # Removed profile_name to avoid conflict with automatic signing
+      targets: ["app"],
+      code_sign_identity: options[:code_sign_identity] || "iPhone Developer",
+      profile_name: nil  # Explicitly set to nil to ensure no manual profile is used
+      # Note: team_id is omitted to let Xcode automatically detect the development team
     )
   end
 
@@ -53,7 +53,10 @@ platform :ios do
       xcodeproj: "app.xcodeproj"
     )
     
-    increment_version_number
+    # Set version number explicitly instead of incrementing
+    increment_version_number(
+      version_number: "1.0.0"
+    )
     
     # Build the app with consistent automatic signing
     build_app(
@@ -62,14 +65,13 @@ platform :ios do
       export_method: "development",
       configuration: "Debug",
       clean: true,
-      xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
+      xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1' CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
       export_options: {
         method: "development",
         compileBitcode: false,
-        teamID: TEAM_ID,
-        signingStyle: "automatic"
-        # Removed provisioningProfiles to avoid conflict with automatic signing
-      }
+        signingStyle: "automatic",
+        provisioningProfiles: {}  # Empty to ensure automatic provisioning
+      }.tap { |opts| opts[:teamID] = TEAM_ID if TEAM_ID && !TEAM_ID.empty? }
     )
   end
 
@@ -86,7 +88,10 @@ platform :ios do
       xcodeproj: "app.xcodeproj"
     )
     
-    increment_version_number
+    # Set version number explicitly instead of incrementing
+    increment_version_number(
+      version_number: "1.0.0"
+    )
     increment_build_number
     
     # Build the app with consistent automatic signing
@@ -96,13 +101,13 @@ platform :ios do
       export_method: "app-store",
       configuration: "Release",
       clean: true,
+      xcargs: "CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
       export_options: {
         method: "app-store",
         compileBitcode: true,
-        teamID: TEAM_ID,
-        signingStyle: "automatic"
-        # Removed provisioningProfiles to avoid conflict with automatic signing
-      }
+        signingStyle: "automatic",
+        provisioningProfiles: {}  # Empty to ensure automatic provisioning
+      }.tap { |opts| opts[:teamID] = TEAM_ID if TEAM_ID && !TEAM_ID.empty? }
     )
   end
   

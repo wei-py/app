@@ -13,7 +13,7 @@ app_identifier(the_app_identifier)
 
 # Load team ID from environment or use a default
 # This should match the TEAM_ID in Fastfile
-ENV['FASTLANE_TEAM_ID'] ||= 'YOUR_TEAM_ID'
+# ENV['FASTLANE_TEAM_ID'] ||= 'YOUR_TEAM_ID'  # Commented out to enable automatic team detection
 
 # If you have multiple teams, you can specify which one to use
 # team_id(ENV['FASTLANE_TEAM_ID'])
