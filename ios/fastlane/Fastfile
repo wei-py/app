@@ -50,8 +50,7 @@ platform :ios do
     
     # Update info plist and version
     update_info_plist(
-      xcodeproj: "app.xcodeproj",
-      target: "app"
+      xcodeproj: "app.xcodeproj"
     )
     
     increment_version_number
@@ -86,8 +85,7 @@ platform :ios do
     
     # Update info plist and version
     update_info_plist(
-      xcodeproj: "app.xcodeproj",
-      target: "app"
+      xcodeproj: "app.xcodeproj"
     )
     
     increment_version_number
@@ -117,8 +115,8 @@ platform :ios do
     # Clean derived data
     sh "rm -rf ~/Library/Developer/Xcode/DerivedData/*"
     
-    # Reinstall pods
-    sh "cd ios && pod deintegrate && pod install && cd .."
+    # Reinstall pods - using absolute path to ensure it works from any directory
+    sh "cd #{File.expand_path(File.join(File.dirname(__FILE__), '..'))} && pod deintegrate && pod install"
     
     # Show instructions for manual setup
     puts "\n\nIMPORTANT NOTES:"

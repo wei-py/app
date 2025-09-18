@@ -1,6 +1,6 @@
 # iOS Build Fixes Documentation
 
-This document explains the fixes we've implemented to resolve common build issues in the iOS project, particularly focusing on the Xcode version and code signing errors.
+This document explains the fixes we've implemented to resolve common build issues in the iOS project, particularly focusing on Xcode version, code signing, and Fastfile configuration errors.
 
 ## Table of Contents
 - [Issue Summary](#issue-summary)
@@ -13,9 +13,10 @@ This document explains the fixes we've implemented to resolve common build issue
 
 The build process was failing with errors related to:
 
-1. **Xcode Version Mismatch**: The error indicated multiple Xcode versions were found, and the build was using `/Applications/Xcode_15.2.app`
+1. **Xcode Version Mismatch**: The error indicated multiple Xcode versions were found, and the build was using incorrect paths
 2. **Provisioning Profile Issues**: "No profile for team '***' matching '***' found"
 3. **Code Signing Configuration**: Missing proper development team selection
+4. **Fastfile Configuration**: Unsupported parameters in update_info_plist action
 
 ## Implemented Fixes
 
@@ -28,6 +29,8 @@ We've completely refactored the Fastfile with these key improvements:
 - **Reusable Signing Configuration**: Created a `configure_signing` helper lane
 - **Detailed Export Options**: Added explicit export options with team ID and signing style
 - **Utility Lane**: Added a `fix_build_issues` lane to automate common fixes
+- **Parameter Fix**: Removed unsupported 'target' parameter from update_info_plist actions
+- **Path Robustness**: Improved path handling in the fix_build_issues lane to work correctly from any directory
 
 ### 2. Appfile Configuration
 
