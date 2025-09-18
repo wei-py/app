@@ -28,4 +28,18 @@
      - core-js-pure
      - esbuild
    ```
-3. 
+
+3.
+
+4. 版本号没有更新
+
+```gradle
+android {
+  defaultConfig {
+    applicationId app_id
+    minSdkVersion rootProject.ext.minSdkVersion
+    targetSdkVersion rootProject.ext.targetSdkVersion
+    versionCode project.hasProperty('android.injected.version.code') ? project.property('android.injected.version.code').toInteger() : 1
+        versionName project.hasProperty('android.injected.version.name') ? project.property('android.injected.version.name') : "1.0" }
+}
+```
