@@ -36,7 +36,7 @@ platform :ios do
 		build_app(
 			scheme: "app2",
 			workspace: "app2.xcworkspace",
-			export_method: "development",
+			export_method: "ad-hoc",
 			configuration: "Debug",
 			clean: true,
 			xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
