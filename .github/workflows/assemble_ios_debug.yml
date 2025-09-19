@@ -14,7 +14,7 @@ on:
 # 工作流环境变量
 env:
   # 应用的application_id
-  APP_ID: ${{secrets.APP_ID || 'com.app2'}}
+  APP_ID: ${{secrets.APP_ID_DEBUG || 'com.app2'}}
   APP_NAME: Taro Demo
   VERSION_NUMBER: 1.0.0
   BUILD_NUMBER: ${{ github.run_number }}
