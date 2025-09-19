@@ -25,71 +25,71 @@ platform :ios do
   end
 
   desc "development"
- lane :build_dev do |options|
-  update_info_plist
-  update_code_signing_settings
-  
-  # 设置版本号（如果环境变量中有指定）
-  if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
-   increment_version_number(
-    version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
-   )
-  end
-  
-  build_app(
-   scheme: "app2",
-   workspace: "app2.xcworkspace",
-   export_method: "development",
-   configuration: "Debug",
-   clean: true,
-   xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
-   export_options: {
-    method: "development",
-    compileBitcode: false,
-    signingStyle: "manual",
-    provisioningProfiles: {
-     ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
-    }
-   }
-  )
- end
+	lane :build_dev do |options|
+		update_info_plist
+		update_code_signing_settings
+		
+		# 设置版本号（如果环境变量中有指定）
+		if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			increment_version_number(
+				version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			)
+		end
+		
+		build_app(
+			scheme: "app2",
+			workspace: "app2.xcworkspace",
+			export_method: "ad-hoc",
+			configuration: "Debug",
+			clean: true,
+			xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
+			export_options: {
+				method: "ad-hoc",
+				compileBitcode: false,
+				signingStyle: "manual",
+				provisioningProfiles: {
+					ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
+				}
+			}
+		)
+	end
 
- desc "release"
- lane :build_release do |options|
-  update_info_plist
-  update_code_signing_settings
-  
-  # 设置版本号（如果环境变量中有指定）
-  if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
-   increment_version_number(
-    version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
-   )
-  end
-  
-  # 设置构建号（如果环境变量中有指定）
-  if ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
-   increment_build_number(
-    build_number: ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
-   )
-  end
-  
-  build_app(
-   scheme: "app2",
-   workspace: "app2.xcworkspace",
-   export_method: "app-store",
-   configuration: "Release",
-   clean: true,
-   export_options: {
-    method: "app-store",
-    compileBitcode: false,
-    signingStyle: "manual",
-    provisioningProfiles: {
-     ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
-    }
-   }
-  )
- end
- 
+	desc "release"
+	lane :build_release do |options|
+		update_info_plist
+		update_code_signing_settings
+		
+		# 设置版本号（如果环境变量中有指定）
+		if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			increment_version_number(
+				version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
+			)
+		end
+		
+		# 设置构建号（如果环境变量中有指定）
+		if ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
+			increment_build_number(
+				build_number: ENV['FL_BUILD_NUMBER_BUILD_NUMBER']
+			)
+		end
+		
+		build_app(
+			scheme: "app2",
+			workspace: "app2.xcworkspace",
+			export_method: "app-store",
+			configuration: "Release",
+			clean: true,
+			export_options: {
+				method: "app-store",
+				compileBitcode: false,
+				signingStyle: "manual",
+				provisioningProfiles: {
+					ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
+				}
+			}
+		)
+	end
+	
 end
 ```
 
@@ -112,7 +112,7 @@ on:
 # 工作流环境变量
 env:
   # 应用的application_id
-  APP_ID: ${{secrets.APP_ID || 'com.app2'}}
+  APP_ID: ${{secrets.APP_ID_DEBUG || 'com.app2'}}
   APP_NAME: Taro Demo
   VERSION_NUMBER: 1.0.0
   BUILD_NUMBER: ${{ github.run_number }}
@@ -196,52 +196,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## ✅ 根本原因分析
-
-1. **`export_method: "development"` 与手动签名冲突**
-   - 你设置了 `signingStyle: "manual"` 并通过环境变量传入了 `provisioningProfiles`。
-   - 但 `development` 导出方式要求使用 Xcode 自动管理的开发证书和描述文件，而你却用的是 **手动指定的 provisioning profile**。
-   - 这种混合模式可能导致签名不一致或无法正确应用。
-
-2. **CI 环境缺少模拟器支持**
-   - `development` 模式通常用于在设备上调试，需要连接真实设备或使用模拟器。
-   - GitHub Actions 的 macOS 跑道（macos-13）**没有物理设备连接**，且默认也不运行模拟器。
-   - 因此，即使你成功编译了 `.app`，也无法完成 `development` 方法的导出。
-
-3. **`gym` 工具对 `development` 的限制**
-   - `gym` 在处理 `development` 方法时，会尝试生成一个可安装到设备上的 `.ipa`，但这个过程依赖于特定的签名规则。
-   - 如果签名信息不完整或不匹配，就会报错。
-
----
-
-### ✅ 最终修复后的 `Fastfile` 示例（关键部分）
-
-```ruby
-lane :build_dev do |options|
-  update_info_plist
-  update_code_signing_settings
-
-  if ENV['FL_VERSION_NUMBER_VERSION_NUMBER']
-    increment_version_number(version_number: ENV['FL_VERSION_NUMBER_VERSION_NUMBER'])
-  end
-
-  build_app(
-    scheme: "app2",
-    workspace: "app2.xcworkspace",
-    export_method: "ad-hoc",
-    configuration: "Debug",
-    clean: true,
-    xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
-    export_options: {
-      method: "ad-hoc",
-      compileBitcode: false,
-      signingStyle: "manual",
-      provisioningProfiles: {
-        ENV['FL_APP_IDENTIFIER'] || "com.app2" => ENV['FL_PROVISIONING_PROFILE_SPECIFIER']
-      }
-    }
-  )
-end
-```
-
----
