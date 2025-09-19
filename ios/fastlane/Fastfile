@@ -41,7 +41,7 @@ platform :ios do
 			clean: true,
 			xcargs: "GCC_PREPROCESSOR_DEFINITIONS='$(inherited) DEBUG=1'",
 			export_options: {
-				method: "development",
+				method: "ad-hoc",
 				compileBitcode: false,
 				signingStyle: "manual",
 				provisioningProfiles: {
