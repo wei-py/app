@@ -43,3 +43,5 @@ android {
         versionName project.hasProperty('android.injected.version.name') ? project.property('android.injected.version.name') : "1.0" }
 }
 ```
+
+## 写一个文件 getInfo.sh
