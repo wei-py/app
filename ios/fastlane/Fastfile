@@ -3,16 +3,9 @@
 default_platform :ios
 
 platform :ios do
-  desc "Import certificates and profiles"
-  lane :import_certificates do
-    sh "../scripts/import-certificate.sh"
-    sh "../scripts/import-profile.sh"
-  end
-
   desc "Build Debug IPA"
   lane :build_debug do
-    import_certificates
-
+    # ✅ 不再调用 import_certificates，由 CI 负责
     gym(
       scheme: "app2",
       configuration: "Debug",
@@ -27,8 +20,6 @@ platform :ios do
 
   desc "Build Release IPA"
   lane :build_release do
-    import_certificates
-
     gym(
       scheme: "app2",
       configuration: "Release",
