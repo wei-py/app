@@ -65,15 +65,11 @@ jobs:
           cd ios
           bundle exec fastlane build_debug
         env:
-          # 修复环境变量引用
           APP_ID: ${{ secrets.APP_ID }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          # 简化环境变量，只保留必要的
           PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.DEBUG_PROVISIONING_PROFILE_SPECIFIER }}
           CODE_SIGN_IDENTITY: "Apple Development"
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          # 证书和配置文件相关
-          SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_P12_DATA }}
-          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_PASSWORD }}
-          PROVISIONING_PROFILE_DATA: ${{ secrets.DEBUG_PROVISIONING_PROFILE_DATA }}
 
       - name: ✅ Check IPA exists
         run: |
