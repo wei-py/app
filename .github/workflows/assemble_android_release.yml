@@ -1,15 +1,19 @@
 # 工作流名称
-name: Assemble Android Release
+name: 🤖 Assemble Android Release
 
 # 触发工作流程的事件
 on:
   push:
     branches: [staging]
     tags: [v*]
-  # pull_request:
-  #   branches: [main]
-
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: '版本名称 (例如: 2.0.0)'
+        required: false
+      version_code:
+        description: '版本号'
+        required: false
 
 # 工作流环境变量
 env:
@@ -19,86 +23,87 @@ env:
   APP_NAME: app2
   # 打包类型
   BUILD_TYPE: release
-  # 版本名称
-  VERSION_NAME: 2.0.0
-  # 版本号
-  VERSION_CODE: 10
+  # 版本名称 - 支持手动输入覆盖
+  VERSION_NAME: ${{ github.event.inputs.version_name || '2.0.0' }}
+  # 版本号 - 支持手动输入覆盖
+  VERSION_CODE: ${{ github.event.inputs.version_code || '10' }}
   # 密钥库文件
   KEYSTORE_FILE: debug.keystore
-  # 密钥库口令
-  KEYSTORE_PASSWORD: android
-  # 密钥库别名
-  KEYSTORE_KEY_ALIAS: androiddebugkey
-  # 密钥库别名口令
-  KEYSTORE_KEY_PASSWORD: android
+  # 密钥库相关信息 - 生产环境应使用 secrets
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'android' }}
+  KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS || 'androiddebugkey' }}
+  KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD || 'android' }}
 
 # 工作流作业
 jobs:
   assemble:
+    name: 构建 Android 应用
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Project
-        uses: actions/checkout@v2
-      - uses: actions/setup-java@v4
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置 Java 环境
+        uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
-      - uses: pnpm/action-setup@v2
+          cache: 'gradle'
+
+      - name: 设置 PNPM
+        uses: pnpm/action-setup@v2
         with:
           version: 8
-      - uses: actions/setup-node@v3
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: "pnpm"
-      - run: pnpm install
 
-      - name: Setup Ruby
+      - name: 安装依赖
+        run: pnpm install
+
+      - name: 设置 Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
           bundler-cache: true
           working-directory: android
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        env:
-          cache-name: gradle-cache
-        with:
-          path: ~/.gradle
-          key: ${{ runner.os }}-gradle
-          restore-keys: |
-            ${{ runner.os }}-gradle
-          
-      - name: Install Ruby dependencies
+      - name: 安装 Ruby 依赖
         working-directory: android
         run: |
-          gem install bundler
           bundle config set --local deployment 'false'
           bundle config set --local path 'vendor/bundle'
           bundle install --retry=3 --jobs=4
-      
-      - name: Assemble Android ${{ env.BUILD_TYPE }}
+
+      - name: 构建 Android ${{ env.BUILD_TYPE }}
         working-directory: android
         run: bundle exec fastlane assemble
-        # run: |
-        #   sudo apt install -y ruby-bundler
-        #   cd android
-        #   bundle update
-        #   bundle exec fastlane assemble
         env:
           KEYSTORE_FILE: ${{ github.workspace }}/android/app/${{ env.KEYSTORE_FILE }}
           NODE_PATH: ${{ github.workspace }}/node_modules/.pnpm/node_modules:$NODE_PATH
-      - name: Upload Android Products
+          VERSION_NAME: ${{ env.VERSION_NAME }}
+          VERSION_CODE: ${{ env.VERSION_CODE }}
+
+      - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: app-${{ env.BUILD_TYPE }}
+          name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}-${{ env.BUILD_TYPE }}
           path: ${{ github.workspace }}/android/app/build/outputs/apk/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
-      - name: Upload release assets
+          retention-days: 7
+
+      - name: 发布到 GitHub Releases
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           prerelease: ${{ contains(github.ref, 'beta') }}
           files: |
             android/app/build/outputs/apk/${{ env.BUILD_TYPE }}/app-${{ env.BUILD_TYPE }}.apk
+          name: ${{ env.APP_NAME }} v${{ env.VERSION_NAME }} (${{ env.VERSION_CODE }})
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
