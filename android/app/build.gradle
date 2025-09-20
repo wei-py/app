@@ -76,7 +76,7 @@ android {
 
     namespace "com.app2"
     defaultConfig {
-        applicationId app_id
+        applicationId project.hasProperty('APP_ID') ? APP_ID : "com.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionName project.hasProperty('VERSION_NAME') ? VERSION_NAME : "1.0.0"
