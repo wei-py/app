@@ -4,10 +4,10 @@ name: Assemble Android Release
 # 触发工作流程的事件
 on:
   push:
-    branches: [main]
+    branches: [staging]
     tags: [v*]
-  pull_request:
-    branches: [main]
+  # pull_request:
+  #   branches: [main]
 
   workflow_dispatch:
 
