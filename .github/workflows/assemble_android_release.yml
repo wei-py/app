@@ -18,15 +18,15 @@ on:
 # 工作流环境变量
 env:
   # 应用的application_id
-  APP_ID: com.app2.app2
+  APP_ID: com.wei.realease
   # 应用名称
-  APP_NAME: app2
+  APP_NAME: wei
   # 打包类型
   BUILD_TYPE: release
   # 版本名称 - 支持手动输入覆盖
-  VERSION_NAME: ${{ github.event.inputs.version_name || '2.0.0' }}
+  VERSION_NAME: 2.9.0
   # 版本号 - 支持手动输入覆盖
-  VERSION_CODE: ${{ github.event.inputs.version_code || '10' }}
+  VERSION_CODE: 10
   # 密钥库文件
   KEYSTORE_FILE: debug.keystore
   # 密钥库相关信息 - 生产环境应使用 secrets
