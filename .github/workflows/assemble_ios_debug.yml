@@ -6,7 +6,7 @@ on:
       - staging
 
 env:
-  APP_ID: ${{ secrets.APP_ID }}
+  APP_ID: com.bto.Light
   APP_NAME: BTOLIGHT
   VERSION_NAME: 2.9.0
   BUILD_NUMBER: ${{ github.run_number }}
