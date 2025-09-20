@@ -1,0 +1,63 @@
+name: 🤖 Build Android Debug (Staging)
+
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  APP_ID: ${{ secrets.APP_ID }}
+  APP_NAME: ${{ secrets.APP_NAME }}
+  VERSION_NAME: 2.9.0
+  VERSION_CODE: 10
+  BUILD_TYPE: debug
+  KEYSTORE_FILE: debug.keystore
+  KEYSTORE_PASSWORD: android
+  KEYSTORE_KEY_ALIAS: androiddebugkey
+  KEYSTORE_KEY_PASSWORD: android
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js & pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          node-version: "22"
+          pnpm-version: "latest"
+
+      - name: 📦 Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec react-native config
+
+      - name: 📱 Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: 🔧 Inject version & app name
+        run: |
+          echo "APP_NAME=${{ env.APP_NAME }}" >> android/gradle.properties
+          echo "VERSION_NAME=${{ env.VERSION_NAME }}" >> android/gradle.properties
+          echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> android/gradle.properties
+
+      - name: 🏗️ Build Debug APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew clean assembleDebug --stacktrace
+
+      - name: ✅ Check APK exists
+        run: |
+          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "❌ APK not found!"
+            exit 1
+          fi
+
+      - name: 💾 Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-android-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
