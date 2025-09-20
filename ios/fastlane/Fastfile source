@@ -10,9 +10,9 @@ platform :ios do
       use_automatic_signing: false,
       path: "app2.xcodeproj",
       team_id: ENV["TEAM_ID"],
-      code_sign_identity: "Apple Development: Yiliang Liao (info@btosolar.com)",  # 使用完整的证书名称
-      profile_name: "BTOLIGHTDev",  # 使用确切的配置文件名称
-      bundle_identifier: "com.bto.Light",  # 使用确切的Bundle ID
+      code_sign_identity: ENV["CODE_SIGN_IDENTITY"],
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"],
+      bundle_identifier: ENV["APP_ID"],
       targets: ["app2"]  # 明确指定目标
     )
     
@@ -29,9 +29,10 @@ platform :ios do
       export_options: {
         method: "development",
         provisioningProfiles: {
-          "com.bto.Light" => "BTOLIGHTDev"  # 使用确切的值而不是环境变量
+          ENV["APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         },
         signingStyle: "manual",
+        signingCertificate: ENV["CODE_SIGN_IDENTITY"],
         teamID: ENV["TEAM_ID"],
         compileBitcode: false
       }
