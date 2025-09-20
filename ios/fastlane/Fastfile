@@ -1,0 +1,10 @@
+lane :setup_certificates do
+  match(
+    type: "development",
+    force: true,
+    readonly: false,
+    git_url: "https://github.com/your-org/your-repo.git",
+    team_id: ENV["TEAM_ID"],
+    username: ENV["FASTLANE_USER"]
+  )
+end

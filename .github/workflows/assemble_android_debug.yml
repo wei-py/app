@@ -6,8 +6,8 @@ on:
       - staging
 
 env:
-  APP_ID: ${{ secrets.APP_ID }}
-  APP_NAME: ${{ secrets.APP_NAME }}
+  APP_ID: com.app2
+  APP_NAME: Taro Demo
   VERSION_NAME: 2.9.0
   VERSION_CODE: 10
   BUILD_TYPE: debug

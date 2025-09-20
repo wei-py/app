@@ -8,7 +8,7 @@ on:
 
 env:
   APP_ID: ${{ secrets.APP_ID }}
-  APP_NAME: app2
+  APP_NAME: Taro Demo Release
   VERSION_NAME: 2.9.0
   VERSION_CODE: 10
   BUILD_NUMBER: ${{ github.run_number }}

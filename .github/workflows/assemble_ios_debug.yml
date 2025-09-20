@@ -9,7 +9,7 @@ env:
   APP_ID: ${{ secrets.APP_ID }}
   APP_NAME: BTOLIGHT
   VERSION_NAME: 2.9.0
-  VERSION_NUMBER: 1.0.0
+  VERSION_NUMBER: 100
   BUILD_NUMBER: ${{ github.run_number }}
   BUILD_TYPE: debug
   TEAM_ID: ${{ secrets.TEAM_ID }}
@@ -46,6 +46,11 @@ jobs:
         run: |
           gem sources --add https://gems.ruby-china.com/ --update
           gem install fastlane -N
+        
+      - name: 🚀 Setup Fastlane Match
+        run: |
+          cd ios
+          fastlane setup_certificates
 
       - name: 🔐 Setup Certificates and Profiles
         run: |
@@ -56,7 +61,9 @@ jobs:
           echo "$PROVISIONING_PROFILE_DATA" | base64 --decode > ~/Certificates/profile.mobileprovision
           # 导入证书
           security import ~/Certificates/cert.p12 -k ~/Library/Keychains/login.keychain-db -P "$SIGNING_CERTIFICATE_PASSWORD" -T /usr/bin/security
-          # 设置配置文件
+          # 创建 Provisioning Profiles 目录
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
+          # 复制配置文件
           cp ~/Certificates/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: 🏗️ Build IPA
