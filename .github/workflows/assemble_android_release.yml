@@ -55,7 +55,7 @@ jobs:
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew clean assembleRelease --stacktrace --warning-mode all
+          ./gradlew clean assembleRelease --stacktrace
 
       - name: ✅ Check APK exists
         run: |
