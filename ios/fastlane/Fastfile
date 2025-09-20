@@ -1,10 +1,43 @@
-lane :setup_certificates do
-  match(
-    type: "development",
-    force: true,
-    readonly: false,
-    git_url: "https://github.com/your-org/your-repo.git",
-    team_id: ENV["TEAM_ID"],
-    username: ENV["FASTLANE_USER"]
-  )
+# ios/fastlane/Fastfile
+
+default_platform :ios
+
+platform :ios do
+  desc "Import certificates and profiles"
+  lane :import_certificates do
+    sh "../scripts/import-certificate.sh"
+    sh "../scripts/import-profile.sh"
+  end
+
+  desc "Build Debug IPA"
+  lane :build_debug do
+    import_certificates
+
+    gym(
+      scheme: "app2",
+      configuration: "Debug",
+      export_method: "development",
+      output_directory: "build/export",
+      output_name: "app-debug.ipa",
+      clean: true,
+      silent: false,
+      skip_package_manager: true
+    )
+  end
+
+  desc "Build Release IPA"
+  lane :build_release do
+    import_certificates
+
+    gym(
+      scheme: "app2",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build/export",
+      output_name: "app-release.ipa",
+      clean: true,
+      silent: false,
+      skip_package_manager: true
+    )
+  end
 end

@@ -9,7 +9,6 @@ env:
   APP_ID: ${{ secrets.APP_ID }}
   APP_NAME: BTOLIGHT
   VERSION_NAME: 2.9.0
-  VERSION_NUMBER: 100
   BUILD_NUMBER: ${{ github.run_number }}
   BUILD_TYPE: debug
   TEAM_ID: ${{ secrets.TEAM_ID }}
@@ -46,46 +45,27 @@ jobs:
         run: |
           gem sources --add https://gems.ruby-china.com/ --update
           gem install fastlane -N
-        
-      - name: 🚀 Setup Fastlane Match
+
+      - name: 🔐 Import Certificate
+        run: |
+          cd scripts
+          ./import-certificate.sh
+
+      - name: 🔐 Import Provisioning Profile
+        run: |
+          cd scripts
+          ./import-profile.sh
+
+      - name: 🏗️ Build IPA with Fastlane
         run: |
           cd ios
-          fastlane setup_certificates
-
-      - name: 🔐 Setup Certificates and Profiles
-        run: |
-          mkdir -p ~/Certificates
-          # 解码证书
-          echo "$SIGNING_CERTIFICATE_P12_DATA" | base64 --decode > ~/Certificates/cert.p12
-          # 解码配置文件
-          echo "$PROVISIONING_PROFILE_DATA" | base64 --decode > ~/Certificates/profile.mobileprovision
-          # 导入证书
-          security import ~/Certificates/cert.p12 -k ~/Library/Keychains/login.keychain-db -P "$SIGNING_CERTIFICATE_PASSWORD" -T /usr/bin/security
-          # 创建 Provisioning Profiles 目录
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
-          # 复制配置文件
-          cp ~/Certificates/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-
-      - name: 🏗️ Build IPA
-        run: |
-          cd ios
-          xcodebuild archive \
-            -project app2.xcodeproj \
-            -scheme app2 \
-            -configuration Debug \
-            -archivePath build/app2.xcarchive \
-            CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_SPECIFIER" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            SKIP_INSTALL=NO \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-
-          # 导出 IPA
-          xcodebuild -exportArchive \
-            -archivePath build/app2.xcarchive \
-            -exportPath build/export \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportFormat ipa
+          fastlane build_debug
+        env:
+          # 传递环境变量
+          SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_P12_DATA }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_PASSWORD }}
+          PROVISIONING_PROFILE_DATA: ${{ secrets.DEBUG_PROVISIONING_PROFILE_DATA }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
 
       - name: ✅ Check IPA exists
         run: |
