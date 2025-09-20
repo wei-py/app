@@ -5,7 +5,6 @@ default_platform :ios
 platform :ios do
   desc "Build Debug IPA"
   lane :build_debug do
-    # ✅ 不再调用 import_certificates，由 CI 负责
     gym(
       scheme: "app2",
       configuration: "Debug",
@@ -13,7 +12,15 @@ platform :ios do
       output_directory: "build/export",
       output_name: "app2.ipa",
       clean: true,
-      silent: false
+      silent: false,
+      export_options: {
+        provisioningProfiles: {
+          ENV["APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        },
+        signingStyle: "manual",
+        signingCertificate: ENV["CODE_SIGN_IDENTITY"],
+        teamID: ENV["TEAM_ID"]
+      }
     )
   end
 
@@ -26,7 +33,15 @@ platform :ios do
       output_directory: "build/export",
       output_name: "app2.ipa",
       clean: true,
-      silent: false
+      silent: false,
+      export_options: {
+        provisioningProfiles: {
+          ENV["APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        },
+        signingStyle: "manual",
+        signingCertificate: ENV["CODE_SIGN_IDENTITY"],
+        teamID: ENV["TEAM_ID"]
+      }
     )
   end
 end
