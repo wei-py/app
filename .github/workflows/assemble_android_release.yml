@@ -55,7 +55,9 @@ jobs:
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew clean assembleRelease --stacktrace
+          # 添加 --warning-mode all 参数以显示具体警告
+          # 添加 -Dorg.gradle.warning.mode=all 参数以处理弃用警告
+          ./gradlew clean assembleRelease --warning-mode=all -Dorg.gradle.warning.mode=all --stacktrace
 
       - name: ✅ Check APK exists
         run: |
@@ -73,7 +75,8 @@ jobs:
       - name: 📦 Build AAB
         run: |
           cd android
-          ./gradlew bundleRelease
+          # 同样添加警告模式参数
+          ./gradlew bundleRelease --warning-mode=all -Dorg.gradle.warning.mode=all
 
       - name: 💾 Upload AAB Artifact
         uses: actions/upload-artifact@v4
