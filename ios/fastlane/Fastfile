@@ -5,44 +5,71 @@ default_platform :ios
 platform :ios do
   desc "Build Debug IPA"
   lane :build_debug do
-    # 使用自动签名方式简化构建过程
+    # 确保正确的代码签名设置
     update_code_signing_settings(
-      use_automatic_signing: true,
+      use_automatic_signing: false,
       path: "app2.xcodeproj",
       team_id: ENV["TEAM_ID"],
-      bundle_identifier: ENV["APP_ID"]
+      code_sign_identity: ENV["CODE_SIGN_IDENTITY"],
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"],
+      bundle_identifier: ENV["APP_ID"],
+      targets: ["app2"]  # 明确指定目标
     )
     
     gym(
+      workspace: "app2.xcworkspace",  # 明确指定 workspace
       scheme: "app2",
       configuration: "Debug",
       export_method: "development",
       output_directory: "build/export",
       output_name: "app2.ipa",
       clean: true,
-      silent: false,
-      # 移除手动签名配置，使用自动签名
-      export_team_id: ENV["TEAM_ID"]
+      include_bitcode: false,  # 禁用 bitcode
+      include_symbols: true,
+      export_options: {
+        method: "development",
+        provisioningProfiles: {
+          ENV["APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
+        },
+        signingStyle: "manual",
+        signingCertificate: ENV["CODE_SIGN_IDENTITY"],
+        teamID: ENV["TEAM_ID"],
+        compileBitcode: false
+      }
     )
   end
 
   desc "Build Release IPA"
   lane :build_release do
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "app2.xcodeproj",
+      team_id: ENV["TEAM_ID"],
+      code_sign_identity: ENV["CODE_SIGN_IDENTITY"],
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"],
+      bundle_identifier: ENV["APP_ID"],
+      targets: ["app2"]
+    )
+    
     gym(
+      workspace: "app2.xcworkspace",
       scheme: "app2",
       configuration: "Release",
       export_method: "app-store",
       output_directory: "build/export",
       output_name: "app2.ipa",
       clean: true,
-      silent: false,
+      include_bitcode: false,
+      include_symbols: true,
       export_options: {
+        method: "app-store",
         provisioningProfiles: {
           ENV["APP_ID"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         },
         signingStyle: "manual",
         signingCertificate: ENV["CODE_SIGN_IDENTITY"],
-        teamID: ENV["TEAM_ID"]
+        teamID: ENV["TEAM_ID"],
+        compileBitcode: false
       }
     )
   end

@@ -53,7 +53,6 @@ jobs:
         run: |
           exec .github/scripts/import-certificate.sh
           
-
       - name: 🔐 Import Provisioning Profile
         env:
           PROVISIONING_PROFILE_DATA: ${{ secrets.DEBUG_PROVISIONING_PROFILE_DATA }}
@@ -63,13 +62,24 @@ jobs:
       - name: 🏗️ Build IPA with Fastlane
         run: |
           cd ios
+          # 显示环境变量（不显示敏感信息）
+          echo "Using APP_ID: $APP_ID"
+          echo "Using TEAM_ID: $TEAM_ID"
+          echo "Using PROVISIONING_PROFILE_SPECIFIER: $PROVISIONING_PROFILE_SPECIFIER"
+          echo "Using CODE_SIGN_IDENTITY: $CODE_SIGN_IDENTITY"
+          
+          # 执行构建
           bundle exec fastlane build_debug
         env:
-          APP_ID: ${{ secrets.APP_ID }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          # 简化环境变量，只保留必要的
-          PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.DEBUG_PROVISIONING_PROFILE_SPECIFIER }}
-          CODE_SIGN_IDENTITY: "Apple Development"
+          # 确保所有环境变量正确传递
+          APP_ID: ${{ env.APP_ID }}
+          TEAM_ID: ${{ env.TEAM_ID }}
+          PROVISIONING_PROFILE_SPECIFIER: ${{ env.PROVISIONING_PROFILE_SPECIFIER }}
+          CODE_SIGN_IDENTITY: ${{ env.CODE_SIGN_IDENTITY }}
+          # 证书和配置文件相关
+          SIGNING_CERTIFICATE_P12_DATA: ${{ env.SIGNING_CERTIFICATE_P12_DATA }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ env.SIGNING_CERTIFICATE_PASSWORD }}
+          PROVISIONING_PROFILE_DATA: ${{ env.PROVISIONING_PROFILE_DATA }}
 
       - name: ✅ Check IPA exists
         run: |
@@ -83,3 +93,4 @@ jobs:
         with:
           name: app-ios-debug-ipa
           path: ios/build/export/app2.ipa
+

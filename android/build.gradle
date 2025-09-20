@@ -28,13 +28,5 @@ allprojects {
             url "$rootDir/../node_modules/expo-camera/android/maven"
         }
     }
-    
-    // 添加以下配置来抑制特定的弃用警告
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:deprecation"
-        }
-    }
 }
-
 apply plugin: "com.facebook.react.rootproject"

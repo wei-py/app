@@ -76,15 +76,11 @@ android {
 
     namespace "com.app2"
     defaultConfig {
-        applicationId project.hasProperty('APP_ID') ? APP_ID : "com.app"
+        applicationId app_id
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName project.hasProperty('VERSION_NAME') ? VERSION_NAME : "1.0.0"
-        versionCode project.hasProperty('VERSION_CODE') ? VERSION_CODE.toInteger() : 1
-        resValue "string", "app_name", project.hasProperty('APP_NAME') ? APP_NAME : "MyApp"
-
-        // versionCode project.hasProperty('android.injected.version.code') ? project.property('android.injected.version.code').toInteger() : 1
-        // versionName project.hasProperty('android.injected.version.name') ? project.property('android.injected.version.name') : "1.0"
+        versionCode project.hasProperty('android.injected.version.code') ? project.property('android.injected.version.code').toInteger() : 1
+        versionName project.hasProperty('android.injected.version.name') ? project.property('android.injected.version.name') : "1.0"
     }
     signingConfigs {
         debug {
@@ -93,33 +89,17 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            storeFile file(System.getenv("HOME") + "/.android/keystore.jks")
-            storePassword System.getenv("KEYSTORE_PASSWORD") // ✅ 和 secrets 名称一致
-            keyAlias System.getenv("KEYSTORE_KEY_ALIAS")
-            keyPassword System.getenv("KEYSTORE_KEY_PASSWORD")
-
-            // storeFile file(System.getenv("HOME") + "/.android/keystore.jks")
-            // storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            // keyAlias System.getenv("ANDROID_KEY_ALIAS")
-            // keyPassword System.getenv("ANDROID_KEY_PASSWORD")
-        }
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
-            resValue "string", "app_name", project.hasProperty('APP_NAME') ? "${APP_NAME} (Debug)" : "MyApp (Debug)"
             signingConfig signingConfigs.debug
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
-            // minifyEnabled enableProguardInReleaseBuilds
-            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            resValue "string", "app_name", project.hasProperty('APP_NAME') ? APP_NAME : "MyApp"
         }
     }
 }
