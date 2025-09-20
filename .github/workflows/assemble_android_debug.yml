@@ -1,16 +1,18 @@
-name: 🤖 Build Android Debug (Staging)
+name: 🤖 Build Android Release (Production)
 
 on:
   push:
     branches:
-      - staging
+      - main
+      - master
 
 env:
-  APP_ID: com.taro
-  APP_NAME: TaroDebug
+  APP_ID: ${{ secrets.APP_ID }}
+  APP_NAME: wei
   VERSION_NAME: 2.9.0
   VERSION_CODE: 10
-  BUILD_TYPE: debug
+  BUILD_NUMBER: ${{ github.run_number }}
+  BUILD_TYPE: release
   KEYSTORE_FILE: debug.keystore
   KEYSTORE_PASSWORD: android
   KEYSTORE_KEY_ALIAS: androiddebugkey
@@ -44,21 +46,38 @@ jobs:
           echo "VERSION_NAME=${{ env.VERSION_NAME }}" >> android/gradle.properties
           echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> android/gradle.properties
 
-      - name: 🏗️ Build Debug APK
+      - name: 🔐 Decode Keystore
+        run: |
+          mkdir -p ~/.android
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ~/.android/keystore.jks
+          chmod 600 ~/.android/keystore.jks
+
+      - name: 🏗️ Build Release APK
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew clean assembleDebug --stacktrace
+          ./gradlew clean assembleRelease --stacktrace
 
       - name: ✅ Check APK exists
         run: |
-          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
+          if [ ! -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
             echo "❌ APK not found!"
             exit 1
           fi
 
-      - name: 💾 Upload Debug APK Artifact
+      - name: 💾 Upload Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: app-android-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: 📦 Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      - name: 💾 Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-android-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
