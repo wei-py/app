@@ -5,6 +5,16 @@ default_platform :ios
 platform :ios do
   desc "Build Debug IPA"
   lane :build_debug do
+    # 确保正确的代码签名设置
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "app2.xcodeproj",
+      team_id: ENV["TEAM_ID"],
+      code_sign_identity: ENV["CODE_SIGN_IDENTITY"],
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"],
+      bundle_identifier: ENV["APP_ID"]
+    )
+    
     gym(
       scheme: "app2",
       configuration: "Debug",
