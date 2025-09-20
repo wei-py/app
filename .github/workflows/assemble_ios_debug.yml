@@ -65,11 +65,15 @@ jobs:
           cd ios
           bundle exec fastlane build_debug
         env:
-          # 传递环境变量
-          SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_P12_DATA }}
-          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.DEBUG_SIGNING_CERTIFICATE_PASSWORD }}
-          PROVISIONING_PROFILE_DATA: ${{ secrets.DEBUG_PROVISIONING_PROFILE_DATA }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
+          # Fastlane 需要的环境变量
+          APP_ID: ${{ env.APP_ID }}
+          PROVISIONING_PROFILE_SPECIFIER: ${{ env.PROVISIONING_PROFILE_SPECIFIER }}
+          CODE_SIGN_IDENTITY: ${{ env.CODE_SIGN_IDENTITY }}
+          TEAM_ID: ${{ env.TEAM_ID }}
+          # 证书和配置文件相关
+          SIGNING_CERTIFICATE_P12_DATA: ${{ env.DEBUG_SIGNING_CERTIFICATE_P12_DATA }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ env.DEBUG_SIGNING_CERTIFICATE_PASSWORD }}
+          PROVISIONING_PROFILE_DATA: ${{ env.DEBUG_PROVISIONING_PROFILE_DATA }}
 
       - name: ✅ Check IPA exists
         run: |
