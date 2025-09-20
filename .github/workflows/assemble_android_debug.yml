@@ -1,18 +1,16 @@
-name: 🤖 Build Android Release (Production)
+name: 🤖 Build Android Debug (Staging)
 
 on:
   push:
     branches:
-      - main
-      - master
+      - staging
 
 env:
-  APP_ID: ${{ secrets.APP_ID }}
-  APP_NAME: wei
+  APP_ID: com.taro
+  APP_NAME: TaroDebug
   VERSION_NAME: 2.9.0
   VERSION_CODE: 10
-  BUILD_NUMBER: ${{ github.run_number }}
-  BUILD_TYPE: release
+  BUILD_TYPE: debug
   KEYSTORE_FILE: debug.keystore
   KEYSTORE_PASSWORD: android
   KEYSTORE_KEY_ALIAS: androiddebugkey
@@ -46,38 +44,21 @@ jobs:
           echo "VERSION_NAME=${{ env.VERSION_NAME }}" >> android/gradle.properties
           echo "VERSION_CODE=${{ env.VERSION_CODE }}" >> android/gradle.properties
 
-      - name: 🔐 Decode Keystore
-        run: |
-          mkdir -p ~/.android
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ~/.android/keystore.jks
-          chmod 600 ~/.android/keystore.jks
-
-      - name: 🏗️ Build Release APK
+      - name: 🏗️ Build Debug APK
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew clean assembleRelease --stacktrace
+          ./gradlew clean assembleDebug --stacktrace
 
       - name: ✅ Check APK exists
         run: |
-          if [ ! -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+          if [ ! -f "android/app/build/outputs/apk/debug/app-debug.apk" ]; then
             echo "❌ APK not found!"
             exit 1
           fi
 
-      - name: 💾 Upload Release APK Artifact
+      - name: 💾 Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-android-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
-
-      - name: 📦 Build AAB
-        run: |
-          cd android
-          ./gradlew bundleRelease
-
-      - name: 💾 Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-android-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: app-android-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
